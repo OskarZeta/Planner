@@ -47,18 +47,17 @@ function compareDates(date1, date2) {
 }
 
 function renderDay(date, withDayOfWeek) {
-  let today = new Date();
-  let dayDiv = document.createElement('DIV');
-  dayDiv.classList.add('day');
-  if (compareDates(today, date)) dayDiv.classList.add('day--active');
-  dayDiv.dataset.date = date;
+  let currentDate = new Date();
+  let day = document.createElement('DIV');
+  day.classList.add('day');
+  if (compareDates(currentDate, date)) day.classList.add('day--active');
+  day.dataset.date = date;
   let span = document.createElement('SPAN');
   span.innerHTML = withDayOfWeek ?
     `${week[getDayOfWeekNumber(date.getDay())]}, ${date.getDate()}` :
     `${date.getDate()}`;
-  dayDiv.appendChild(span);
-  let activeEvents = JSON.parse(localStorage.getItem('planner-events')) || [];
-  let existingEvent = activeEvents.find(e => compareDates(new Date(e.date), date));
+  day.appendChild(span);
+  let existingEvent = findEvent(date).event;
   if (existingEvent) {
     let eventContent = document.createElement('DIV');
     eventContent.innerHTML = `
@@ -66,9 +65,10 @@ function renderDay(date, withDayOfWeek) {
       <div>${existingEvent.participants}</div>
       <div>${existingEvent.description}</div>
     `;
-    dayDiv.appendChild(eventContent);
+    day.classList.add('day--with-event');
+    day.appendChild(eventContent);
   }
-  return dayDiv;
+  return day;
 }
 
 function renderMonth(year, month, days) {
@@ -105,7 +105,6 @@ function resetEventForm() {
     content.appendChild(eventForm);
   }
 }
-
 function resetContent() {
   let calendar = document.querySelector('.content');
   calendar.innerHTML = '';
@@ -115,7 +114,6 @@ function setCurrentMonthYear(month, year) {
   let dateContainer = document.querySelector('.date-current');
   dateContainer.innerHTML = `${months[month]} ${year}`;
 }
-
 function calcDaysArray(month, year) {
   let monthLenght = new Date(year, month + 1, 0).getDate();
   let days = [...new Array(monthLenght).keys()].map(day => day + 1);
@@ -146,52 +144,103 @@ function renderPage(date) {
   let daysArray = calcDaysArray(month, year);
   renderMonth(year, month, daysArray);
 }
+function renderForm(day) {
+  let date = new Date(day.dataset.date);
+  let eventForm = document.querySelector('.event');
+  day.appendChild(eventForm);
+  eventForm.classList.remove('hidden');
+  eventForm.querySelector('.event__date').value = `${date.getDate()}`;
+  let name = eventForm.querySelector('.event__name');
+  let participants = eventForm.querySelector('.event__participants');
+  let description = eventForm.querySelector('.event__description');
+  let existingEvent = findEvent(date).event || {
+    name : '',
+    participants : '',
+    description : ''
+  };
+  name.value = existingEvent.name;
+  participants.value = existingEvent.participants;
+  description.value = existingEvent.description;
+  eventForm.dataset.date = day.dataset.date;
+  calendar.clientWidth - (day.offsetLeft + day.clientWidth) < eventForm.clientWidth ?
+    eventForm.classList.add('event--left') :
+    eventForm.classList.remove('event--left');
+}
+
+function findEvent(date) {
+  if (typeof date === 'string') date = new Date(date);
+  let events = getEvents();
+  let index = events.indexOf(events.find(e => compareDates(new Date(e.date), date)))
+  return {
+    index,
+    event: events[index]
+  };
+}
+function addEvent(info) {
+  let events = getEvents();
+  events.push(info);
+  setEvents(events);
+}
+function updateEvent(index, info) {
+  let events = getEvents();
+  events[index] = info;
+  setEvents(events);
+}
+function deleteEvent(index) {
+  let events = getEvents();
+  events.splice(index, 1);
+  setEvents(events);
+}
+function getEvents() {
+  return JSON.parse(localStorage.getItem('planner-events')) || [];
+}
+function setEvents(data) {
+  localStorage.setItem('planner-events', JSON.stringify(data));
+}
 
 renderPage(curr);
 
-document.querySelector('MAIN').addEventListener('click', e => {
-  if (e.target.classList.contains('prev')) {
-    curr = new Date(curr.getFullYear(), curr.getMonth() - 1);
+//// event handlers
+
+let header = document.querySelector('.header');
+header.addEventListener('click', e => {
+  let isPrev = e.target.classList.contains('prev');
+  let isNext = e.target.classList.contains('next');
+  if (isPrev || isNext) {
+    curr = new Date(curr.getFullYear(), curr.getMonth() - (isPrev ? 1 : -1));
     renderPage(curr);
   }
-  if (e.target.classList.contains('next')) {
-    curr = new Date(curr.getFullYear(), curr.getMonth() + 1);
-    renderPage(curr);
-  }
-  if (e.target.classList.contains('day')) {
-    let dayEl = e.target;
-    let calendarEl = document.querySelector('.content');
-    let date = new Date(dayEl.dataset.date);
+});
+
+let calendar = document.querySelector('.content');
+calendar.addEventListener('click', e => {
+  let day = e.target.closest('.day');
+  if (day && !e.target.closest('.event')) {
+    renderForm(day);
+  } else if (e.target.closest('.event')) {
     let eventForm = document.querySelector('.event');
-    dayEl.appendChild(eventForm);
-    eventForm.classList.remove('hidden');
-    eventForm.querySelector('.event__date').value = `${date.getDate()}`;
-    eventForm.dataset.date = dayEl.dataset.date;
-    if (calendarEl.clientWidth - (dayEl.offsetLeft + dayEl.clientWidth) < eventForm.clientWidth) {
-      eventForm.classList.add('event--left');
-    } else {
-      eventForm.classList.remove('event--left');
+    if (e.target.classList.contains('close-form')) {
+      resetEventForm();
+    } else if (e.target.classList.contains('confirm-form')) {
+      let date = new Date(eventForm.dataset.date);
+      let name = eventForm.querySelector('.event__name').value.trim();
+      let participants = eventForm.querySelector('.event__participants').value.trim();
+      let description = eventForm.querySelector('.event__description').value.trim();
+      let eventInfo = { date, name, participants, description };
+      if (!name || !participants || !description) {
+        return alert('Заполните все поля!');
+      }
+      let eventIndex = findEvent(date).index;
+      eventIndex !== -1 ? updateEvent(eventIndex, eventInfo) : addEvent(eventInfo);
+      renderPage(curr);
+    } else if (e.target.classList.contains('clear-form')) {
+      let confirmation = confirm('Do you want do delete this event?');
+      if (confirmation) {
+        let date = new Date(eventForm.dataset.date);
+        let eventIndex = findEvent(date).index;
+        deleteEvent(eventIndex);
+        renderPage(curr);
+      }
     }
-  }
-  if (e.target.classList.contains('close-form')) {
-    resetEventForm();
-  }
-  if (e.target.classList.contains('confirm-form')) {
-    e.preventDefault();
-    let date = new Date(document.querySelector('.event').dataset.date);
-    let name = document.querySelector('.event__name').value.trim();
-    let participants = document.querySelector('.event__participants').value.trim();
-    let description = document.querySelector('.event__description').value.trim();
-    let eventInfo = { date, name, participants, description };
-    if (!name || !participants || !description) {
-      return alert('Заполните все поля!');
-    }
-    let activeEvents = JSON.parse(localStorage.getItem('planner-events')) || [];
-    let existingEvent = activeEvents.find(e => compareDates(new Date(e.date), date));
-    existingEvent ?
-      activeEvents[activeEvents.indexOf(existingEvent)] = eventInfo :
-      activeEvents.push(eventInfo);
-    localStorage.setItem('planner-events', JSON.stringify(activeEvents));
-    renderPage(curr);
   }
 });
