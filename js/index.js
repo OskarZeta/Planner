@@ -50,9 +50,10 @@ function renderDay(date, withDayOfWeek) {
   let currentDate = new Date();
   let day = document.createElement('DIV');
   day.classList.add('day');
-  if (compareDates(currentDate, date)) day.classList.add('day--active');
+  if (compareDates(currentDate, date)) day.classList.add('day--today');
   day.dataset.date = date;
   let span = document.createElement('SPAN');
+  span.classList.add('day__date');
   span.innerHTML = withDayOfWeek ?
     `${week[getDayOfWeekNumber(date.getDay())]}, ${date.getDate()}` :
     `${date.getDate()}`;
@@ -144,7 +145,7 @@ function renderPage(date) {
   let daysArray = calcDaysArray(month, year);
   renderMonth(year, month, daysArray);
 }
-function renderForm(day) {
+function renderEventForm(day) {
   let date = new Date(day.dataset.date);
   let eventForm = document.querySelector('.event');
   day.appendChild(eventForm);
@@ -153,6 +154,7 @@ function renderForm(day) {
   let name = eventForm.querySelector('.event__name');
   let participants = eventForm.querySelector('.event__participants');
   let description = eventForm.querySelector('.event__description');
+  let deleteBtn = eventForm.querySelector('.event__form-clear');
   let existingEvent = findEvent(date).event || {
     name : '',
     participants : '',
@@ -161,6 +163,7 @@ function renderForm(day) {
   name.value = existingEvent.name;
   participants.value = existingEvent.participants;
   description.value = existingEvent.description;
+  deleteBtn.disabled = findEvent(date).index === -1;
   eventForm.dataset.date = day.dataset.date;
   calendar.clientWidth - (day.offsetLeft + day.clientWidth) < eventForm.clientWidth ?
     eventForm.classList.add('event--left') :
@@ -191,6 +194,11 @@ function deleteEvent(index) {
   events.splice(index, 1);
   setEvents(events);
 }
+function manageEvent(eventInfo) {
+  let eventIndex = findEvent(eventInfo.date).index;
+  eventIndex !== -1 ? updateEvent(eventIndex, eventInfo) : addEvent(eventInfo);
+  renderPage(curr);
+}
 function getEvents() {
   return JSON.parse(localStorage.getItem('planner-events')) || [];
 }
@@ -202,12 +210,70 @@ renderPage(curr);
 
 //// event handlers
 
-let header = document.querySelector('.header');
-header.addEventListener('click', e => {
+function clearActiveDay() {
+  let activeDay = document.querySelector('.day--active');
+  if (activeDay) {
+    activeDay.classList.remove('day--active');
+  }
+}
+function setActiveDay(target) {
+  target.classList.add('day--active');
+}
+
+let body = document.querySelector('body');
+body.addEventListener('click', e => {
+  if (!e.target.closest('.content')) {
+    clearActiveDay();
+    resetEventForm();
+  }
+});
+
+let quickFormToggle = document.querySelector('.quick-event__form-toggle');
+quickFormToggle.addEventListener('click', e => {
+  let quickForm = document.querySelector('.quick-event__container');
+  quickForm.classList.contains('hidden') ?
+    quickForm.classList.remove('hidden') :
+    quickForm.classList.add('hidden');
+});
+
+let quickFormClose = document.querySelector('.quick-event__form-close');
+quickFormClose.addEventListener('click', e => {
+  let quickForm = document.querySelector('.quick-event__container');
+  quickForm.classList.add('hidden');
+});
+
+let quickFormConfirm = document.querySelector('.quick-event__form-confirm');
+quickFormConfirm.addEventListener('click', e => {
+  let rawData = document.querySelector('.quick-event__form-text').value.trim().split(',').map(el => el.trim());
+  if (rawData.length < 4 || rawData.some((el, i) => el.length === 0 && i < 4)) return alert('wrong info format!');
+  if (rawData[0].split(' ').length < 2) return alert('wrong date format!');
+  let day = Number(rawData[0].split(' ')[0]);
+  let month = rawData[0].split(' ')[1];
+  months.some((el, index) => {
+    if (month.slice(0, -1).toLowerCase() === el.slice(0, -1).toLowerCase() ||
+        month.slice(0, -1).toLowerCase() === el.toLowerCase()) {
+      month = index;
+      return true;
+    }
+  });
+  let date = new Date(new Date().getFullYear(), month, day);
+  if (Number.isNaN(Date.parse(date))) return alert('errors in date validation!');
+  let name = rawData[1];
+  let participants = rawData[2];
+  let description = rawData.slice(3).join(', ');
+  let eventInfo = { date, name, participants, description };
+  manageEvent(eventInfo);
+});
+
+let dateContainer = document.querySelector('.date-container');
+dateContainer.addEventListener('click', e => {
   let isPrev = e.target.classList.contains('prev');
   let isNext = e.target.classList.contains('next');
   if (isPrev || isNext) {
     curr = new Date(curr.getFullYear(), curr.getMonth() - (isPrev ? 1 : -1));
+    renderPage(curr);
+  } else if (e.target.classList.contains('today')) {
+    curr = new Date();
     renderPage(curr);
   }
 });
@@ -216,12 +282,15 @@ let calendar = document.querySelector('.content');
 calendar.addEventListener('click', e => {
   let day = e.target.closest('.day');
   if (day && !e.target.closest('.event')) {
-    renderForm(day);
+    clearActiveDay();
+    setActiveDay(day);
+    renderEventForm(day);
   } else if (e.target.closest('.event')) {
     let eventForm = document.querySelector('.event');
-    if (e.target.classList.contains('close-form')) {
+    if (e.target.classList.contains('event__form-close')) {
+      clearActiveDay();
       resetEventForm();
-    } else if (e.target.classList.contains('confirm-form')) {
+    } else if (e.target.classList.contains('event__form-confirm')) {
       let date = new Date(eventForm.dataset.date);
       let name = eventForm.querySelector('.event__name').value.trim();
       let participants = eventForm.querySelector('.event__participants').value.trim();
@@ -230,10 +299,8 @@ calendar.addEventListener('click', e => {
       if (!name || !participants || !description) {
         return alert('Заполните все поля!');
       }
-      let eventIndex = findEvent(date).index;
-      eventIndex !== -1 ? updateEvent(eventIndex, eventInfo) : addEvent(eventInfo);
-      renderPage(curr);
-    } else if (e.target.classList.contains('clear-form')) {
+      manageEvent(eventInfo);
+    } else if (e.target.classList.contains('event__form-clear')) {
       let confirmation = confirm('Do you want do delete this event?');
       if (confirmation) {
         let date = new Date(eventForm.dataset.date);
