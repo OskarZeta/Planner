@@ -11,7 +11,7 @@
       <section class="top">
         <div class="container">
           <div>
-            <button type="button" name="button" class="quick-event__form-toggle">Добавить событие</button>
+            <button type="button" name="button" class="quick-event__form-show">Добавить событие</button>
             <div class="quick-event__container hidden">
               <button type="button" class="quick-event__form-close">X</button>
               <form class="quick-event__form">
@@ -21,8 +21,8 @@
             </div>
           </div>
           <div class="top__search">
-            <input type="search">
-            <button>Поиск</button>
+            <input type="search" placeholder="search event" autocomplete="off" class="top__search-input">
+            <div class="top__search-results"></div>
           </div>
         </div>
       </section>
