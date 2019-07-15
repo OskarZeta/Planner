@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Planner</title>
+  <link rel="icon" type="image/x-icon" href="planner.ico">
+  <link rel="stylesheet" type="text/css" href="css/bundle.css">
+</head>
+<body>
+  <div>
+    <main>
+      <section class="top">
+        <div class="container container--top">
+          <div class="top__event">
+            <button class="top__event-show" type="button" name="button">
+              Добавить событие
+            </button>
+            <div class="top__event-container form hidden">
+              <button class="top__event-close form__close" type="button"></button>
+              <form class="top__event-form">
+                <textarea class="top__event-text form__textarea" name="info"></textarea>
+                <button class="top__event-confirm" type="button">Создать</button>
+              </form>
+            </div>
+          </div>
+          <div class="top__search">
+            <div class="top__search-container">
+              <span class="top__search-icon">🔍</span>
+              <div class="top__search-input-wrapper">
+                <input class="top__search-input" type="search" placeholder="Искать событие" autocomplete="off">
+                <div class="top__search-results"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="date">
+        <div class="container">
+          <div class="date__wrapper">
+            <button class="date__prev date__btn" type="button" name="button">◀</button>
+            <span class="date__current"></span>
+            <button class="date__next date__btn" type="button" name="button">▶</button>
+          </div>
+          <button class="date__today date__btn" type="button" name="button">Cегодня</button>
+        </div>
+      </section>
+      <section class="content__container">
+        <div class="container">
+          <table class="content" border="1px" bordercolor="#cacaca"></table>
+          <div class="event form hidden">
+            <button type="button" name="button" class="event__form-close form__close"></button>
+            <form>
+              <div>
+                <input class="event__name form__input" type="text" placeholder="Событие">
+                <input class="event__date form__input" type="text" placeholder="День, месяц, год" readonly>
+                <input class="event__participants form__input" type="text" placeholder="Имена участников">
+                <textarea class="event__description form__textarea" placeholder="Описание"></textarea>
+              </div>
+              <div>
+                <button type="button" name="button" class="event__form-confirm">Готово</button>
+                <button type="button" name="button" class="event__form-clear">Удалить</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="js/bundle.js"></script>
+</body>
+</html>

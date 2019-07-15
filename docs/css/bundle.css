@@ -1,0 +1,260 @@
+.day {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	width: 143px;
+	height: 143px;
+	border-collapse: collapse;
+	text-align: left;
+	background: white;
+	padding: 8px;
+	cursor: pointer;
+}
+.day__date {
+	font-size: 16px;
+	margin-bottom: 5px;
+}
+.day__content {
+	font-size: 14px;
+	word-wrap: break-word;
+	overflow-y: auto;
+}
+.day__content > div {
+	margin-bottom: 2px;
+}
+.day--today {
+	background: rgb(244, 244, 244);
+}
+.day--today .day__date {
+	font-weight: bold;
+}
+.day--active {
+	border: 3px solid rgb(133, 196, 246);
+}
+.day--with-event {
+	background: rgb(193, 228, 255);
+}
+.top {
+	display: flex;
+	justify-content: space-between;
+	background: rgb(244, 244, 244);
+	padding: 50px 0 20px 0;
+	box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.5);
+}
+.top__search-container {
+	display: flex;
+	align-items: center;
+}
+.top__search-icon {
+	font-size: 18px;
+}
+.top__search-input-wrapper {
+	position: relative;
+	padding-left: 10px;
+}
+.top__search-input {
+	height: 30px;
+	width: 250px;
+	padding: 0 10px;
+}
+.top__search-results {
+	position: absolute;
+	top: calc(100% + 10px);
+	z-index: 2;
+	width: calc(100% - 10px);
+	background: white;
+}
+.top__search-results > * {
+	padding: 10px;
+	box-shadow: 1px 2px 5px 1px rgba(0, 0, 0, 0.3);
+	border-radius: 3px;
+}
+.top__search-results-list {
+	list-style-type: none;
+	margin: 0;
+	max-height: calc(50px * 8 + 20px);
+	overflow-y: auto;
+}
+.top__search-results-item {
+	border-bottom: 1px solid rgb(200, 200, 200);
+	padding: 5px;
+	margin-bottom: 3px;
+	cursor: pointer;
+	overflow-x: hidden;
+}
+.top__search-results-item:hover {
+	background: rgb(24, 159, 255);
+	color: white;
+}
+.top__search-name {
+	font-weight: bold;
+}
+.top__event {
+	position: relative;
+}
+.top__event-container {
+	position: absolute;
+	top: calc(100% + 10px);
+	z-index: 2;
+}
+.top__event-show {
+	padding: 0 15px;
+	height: 30px;
+	background: rgb(2, 113, 199);
+	border: none;
+	border-radius: 4px;
+	color: white;
+	font-weight: bold;
+	transition: 0.1s;
+}
+.top__event-show:hover {
+	background: rgb(26, 139, 226);
+}
+.top__event-show:disabled {
+	background: rgb(0, 84, 148);
+	color: rgba(255, 255, 255, 0.8);
+}
+.top__event-confirm {
+	width: 80px;
+}
+.container {
+    display: flex;
+	width: 1000px;
+	margin: 0 auto;
+}
+.container--top {
+    justify-content: space-between;
+}
+.content {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+}
+.content__container {
+	position: relative;
+}
+.content__week {
+    display: flex;
+    justify-content: center;
+}
+.form {
+    width: 300px;
+    background: white;
+    box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.7);
+    border-radius: 3px;
+    cursor: auto;
+}
+.form__close {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    border: none;
+    padding: 0;
+    background: transparent;
+    width: 10px;
+    height: 10px;
+}
+.form__close::before, .form__close::after{
+    display: block;
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    height: 2px;
+    width: 10px;
+    background: black;
+    transition: 0.2s;
+}
+.form__close:hover::before, .form__close:hover::after {
+    background: red;
+}
+.form__close:active::before, .form__close:active::after {
+    width: 9px;
+    left: 1px;
+}
+.form__close::before{
+    transform: rotate(45deg);
+}
+.form__close::after{
+    transform: rotate(-45deg);
+}
+.form form {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+.form__input, .form__textarea {
+    width: 100%;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    background: rgb(250, 250, 250);
+    border: 2px solid #cacaca;
+}
+.form__input {
+    height: 30px;
+    padding: 2px 10px;
+}
+.form__textarea {
+    height: 120px;
+    padding: 10px;
+    resize: none;
+}
+
+.date {
+    padding: 10px 0;
+}
+.date__wrapper {
+    display: flex;
+    margin-right: 20px;
+}
+.date__current {
+    width: 120px;
+    text-align: center;
+}
+.date__btn {
+    background: white;
+    border: none;
+    box-shadow: inset 0 0 3px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 3px;
+    padding: 1px;
+    transition: 0.1s;
+}
+.date__btn:hover {
+    box-shadow: inset 0 0 5px 0 rgba(0, 0, 0, 0.5);
+}
+.date__btn:active {
+    box-shadow: inset 0 0 10px 0 rgba(0, 0, 0, 0.5);
+}
+.date__prev, .date__next {
+    font-size: 10px;
+    width: 20px;
+}
+.date__today {
+    width: 70px;
+}
+.event {
+	position: absolute;
+	top: 10px;
+	left: calc(100% + 10px);
+	z-index: 2;
+}
+.event--left {
+	left: -310px;
+}
+* {
+	box-sizing: border-box;
+	outline: none;
+}
+body {
+	margin: 0;
+	padding: 0;
+}
+button {
+	cursor: pointer;
+}
+.hidden {
+	display: none;
+}
+
+
+/*# sourceMappingURL=bundle.css.map*/
