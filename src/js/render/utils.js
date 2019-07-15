@@ -4,11 +4,23 @@ export function getDayOfWeekNumber(day) {
   if (day === 0) return 6;
   return day - 1;
 }
+export function showElement(element) {
+  element.classList.remove('hidden');
+}
+export function hideElement(element) {
+  element.classList.add('hidden');
+}
+export function disableElement(element) {
+  element.disabled = true;
+}
+export function enableElement(element) {
+  element.disabled = false;
+}
 export function resetEventForm() {
-  let content = document.querySelector('.content-container');
+  let content = document.querySelector('.content__container');
   let eventForm = document.querySelector('.event');
   if (eventForm) {
-    eventForm.classList.add('hidden');
+    hideElement(eventForm);
     content.appendChild(eventForm);
   }
 }
@@ -58,18 +70,6 @@ export function calcEventFormOffset(day) {
     eventForm.classList.remove('event--left');
 }
 export function setCurrentMonthYear(month, year) {
-  let dateContainer = document.querySelector('.date-current');
+  let dateContainer = document.querySelector('.date__current');
   dateContainer.innerHTML = `${months[month]} ${year}`;
-}
-export function showElement(element) {
-  element.classList.remove('hidden');
-}
-export function hideElement(element) {
-  element.classList.add('hidden');
-}
-export function disableElement(element) {
-  element.disabled = true;
-}
-export function enableElement(element) {
-  element.disabled = false;
 }

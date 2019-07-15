@@ -1,22 +1,15 @@
 import {
-  //getDayOfWeekNumber,
   resetEventForm,
-  //clearContent,
   clearSearchResults,
   clearActiveDay,
   setActiveDay,
-  //calcDaysArray,
-  //calcEventFormOffset,
-  //setCurrentMonthYear,
   showElement,
   hideElement,
   disableElement,
   enableElement,
 } from '../render/utils.js';
 import {
-  //renderDay,
-  //renderMonth,
-  renderPage,
+  renderNewPage,
   renderEventForm,
   renderSearchResults
 } from '../render/render.js';
@@ -25,7 +18,7 @@ import {
   manageEvent,
   deleteEvent
 } from '../tasks/tasks.js';
-import { current, setDate } from '../utils.js';
+import { current } from '../utils.js';
 import { months } from '../globals.js';
 
 export function bodyHandler(e) {
@@ -36,20 +29,25 @@ export function bodyHandler(e) {
   if (!e.target.closest('.top__search')) {
     clearSearchResults();
   }
+  if (!e.target.closest('.top__event')) {
+    quickFormClose();
+  }
 }
 export function quickFormShow(e) {
-  let quickForm = document.querySelector('.quick-event__container');
+  let quickForm = document.querySelector('.top__event-container');
   showElement(quickForm);
   disableElement(e.target);
 }
-export function quickFormClose(e) {
-  let quickForm = document.querySelector('.quick-event__container');
+export function quickFormClose() {
+  let quickFormText = document.querySelector('.top__event-text');
+  quickFormText.value = '';
+  let quickForm = document.querySelector('.top__event-container');
   hideElement(quickForm);
-  let quickFormShow = document.querySelector('.quick-event__form-show');
+  let quickFormShow = document.querySelector('.top__event-show');
   enableElement(quickFormShow);
 }
-export function quickFormConfirm(e) {
-  let rawData = document.querySelector('.quick-event__form-text').value.trim().split(',').map(el => el.trim());
+export function quickFormConfirm() {
+  let rawData = document.querySelector('.top__event-text').value.trim().split(',').map(el => el.trim());
   if (rawData.length < 4 || rawData.some((el, i) => el.length === 0 && i < 4)) return alert('wrong info format!');
   if (rawData[0].split(' ').length < 2) return alert('wrong date format!');
   let day = Number(rawData[0].split(' ')[0]);
@@ -68,19 +66,16 @@ export function quickFormConfirm(e) {
   let description = rawData.slice(3).join(', ');
   let eventInfo = { date, name, participants, description };
   manageEvent(eventInfo);
+  renderNewPage(date, true);
 }
 export function dateHandler(e) {
-  let isPrev = e.target.classList.contains('prev');
-  let isNext = e.target.classList.contains('next');
-  let today = e.target.classList.contains('today');
+  let isPrev = e.target.classList.contains('date__prev');
+  let isNext = e.target.classList.contains('date__next');
+  let today = e.target.classList.contains('date__today');
   if (isPrev || isNext) {
-    setDate(new Date(current.getFullYear(), current.getMonth() - (isPrev ? 1 : -1)));
-    renderPage(current);
+    renderNewPage(new Date(current.getFullYear(), current.getMonth() - (isPrev ? 1 : -1)));
   } else if (today) {
-    setDate(new Date());
-    renderPage(current);
-    let day = document.querySelector('.day--today');
-    day.click();
+    renderNewPage(new Date(), true);
   }
 }
 export function contentHandler(e) {
@@ -110,7 +105,7 @@ export function contentHandler(e) {
         let date = new Date(eventForm.dataset.date);
         let eventIndex = findEvent(date).index;
         deleteEvent(eventIndex);
-        renderPage(current);
+        renderNewPage(current);
       }
     }
   }

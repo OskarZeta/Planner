@@ -1,6 +1,6 @@
 import { compareDates } from '../utils.js';
-import { renderPage } from '../render/render.js';
-import { current, setDate } from '../utils.js';
+import { renderNewPage } from '../render/render.js';
+import { current } from '../utils.js';
 
 export function findEvent(date) {
   if (typeof date === 'string') date = new Date(date);
@@ -29,7 +29,7 @@ export function deleteEvent(index) {
 export function manageEvent(eventInfo) {
   let eventIndex = findEvent(eventInfo.date).index;
   eventIndex !== -1 ? updateEvent(eventIndex, eventInfo) : addEvent(eventInfo);
-  renderPage(current);
+  renderNewPage(current);
 }
 export function getEvents() {
   return JSON.parse(localStorage.getItem('planner-events')) || [];

@@ -1,4 +1,3 @@
-import { months, week } from './globals.js';
 import { renderPage } from './render/render.js';
 import {
   bodyHandler,
@@ -9,19 +8,20 @@ import {
   contentHandler,
   searchHandler
 } from './event_handlers/handlers.js';
-import { current, setDate } from './utils.js';
+import { current } from './utils.js';
+import '../css/style.css';
 
+// initial render
 renderPage(current);
 
-//// event handlers
-
+// event handlers
 let body = document.querySelector('body');
-let quickFormShowBtn = document.querySelector('.quick-event__form-show');
-let quickFormCloseBtn = document.querySelector('.quick-event__form-close');
-let quickFormConfirmBtn = document.querySelector('.quick-event__form-confirm');
-let dateContainer = document.querySelector('.date-container');
-let calendar = document.querySelector('.content');
+let quickFormShowBtn = document.querySelector('.top__event-show');
+let quickFormCloseBtn = document.querySelector('.top__event-close');
+let quickFormConfirmBtn = document.querySelector('.top__event-confirm');
 let search = document.querySelector('.top__search-input');
+let dateContainer = document.querySelector('.date');
+let calendar = document.querySelector('.content');
 
 body.addEventListener('click', bodyHandler, true);
 quickFormShowBtn.addEventListener('click', quickFormShow);
