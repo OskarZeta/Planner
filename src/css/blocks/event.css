@@ -1,0 +1,9 @@
+.event {
+	position: absolute;
+	top: 10px;
+	left: calc(100% + 10px);
+	z-index: 2;
+}
+.event--left {
+	left: -310px;
+}

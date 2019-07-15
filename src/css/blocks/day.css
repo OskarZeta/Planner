@@ -1,0 +1,36 @@
+.day {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	width: 143px;
+	height: 143px;
+	border-collapse: collapse;
+	text-align: left;
+	background: white;
+	padding: 8px;
+	cursor: pointer;
+}
+.day__date {
+	font-size: 16px;
+	margin-bottom: 5px;
+}
+.day__content {
+	font-size: 14px;
+	word-wrap: break-word;
+	overflow-y: auto;
+}
+.day__content > div {
+	margin-bottom: 2px;
+}
+.day--today {
+	background: rgb(244, 244, 244);
+}
+.day--today .day__date {
+	font-weight: bold;
+}
+.day--active {
+	border: 3px solid rgb(133, 196, 246);
+}
+.day--with-event {
+	background: rgb(193, 228, 255);
+}

@@ -1,0 +1,22 @@
+@import './blocks/day.css';
+@import './blocks/top.css';
+@import './blocks/container.css';
+@import './blocks/content.css';
+@import './blocks/form.css';
+@import './blocks/date.css';
+@import './blocks/event.css';
+
+* {
+	box-sizing: border-box;
+	outline: none;
+}
+body {
+	margin: 0;
+	padding: 0;
+}
+button {
+	cursor: pointer;
+}
+.hidden {
+	display: none;
+}
